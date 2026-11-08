@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Публикация видео</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#eef3ff;
+    text-align:center;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    width:850px;
+    max-width:95%;
+    margin:auto;
+    padding:30px;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.info{
+    background:#f8f9ff;
+    padding:15px;
+    border-radius:10px;
+    margin:20px 0;
+    text-align:left;
+}
+
+.tagRow{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin:12px 0;
+    flex-wrap:wrap;
+}
+
+.hash{
+    font-weight:bold;
+    font-size:18px;
+}
+
+.className{
+    width:110px;
+    padding:9px 5px;
+    margin-right:20px;
+    font-weight:bold;
+    font-size:14px;
+    text-align:center;
+    color:#4a6cf7;
+    background:#eef2ff;
+    border:2px solid #c7d2fe;
+    border-radius:10px;
+    box-sizing:border-box;
+}
+
+input{
+    width:140px;
+    padding:8px;
+    text-align:center;
+    box-sizing:border-box;
+}
+
+.checkBtn{
+    padding:8px 12px;
+    border:none;
+    border-radius:8px;
+    background:#4a6cf7;
+    color:white;
+    cursor:pointer;
+}
+
+.ok{ background:#22c55e !important; color:white; }
+.bad{ background:#ef4444 !important; color:white; }
+
+button.main{
+    margin-top:20px;
+    padding:10px 18px;
+    border:none;
+    border-radius:8px;
+    background:#999;
+    color:white;
+    cursor:not-allowed;
+    font-size:16px;
+}
+
+button.main.active{
+    background:#4a6cf7;
+    cursor:pointer;
+}
+
+#barBox{
+    width:100%;
+    background:#fff;
+    border:2px solid #ddd;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:20px;
+    height:25px;
+}
+
+#bar{
+    width:0%;
+    height:100%;
+    background:#4a6cf7;
+    transition:2.5s linear;
+}
+
+#percent{
+    margin-top:10px;
+    font-size:18px;
+    color:#4a6cf7;
+    font-weight:bold;
+}
+
+#status{
+    margin-top:10px;
+    font-size:18px;
+    font-weight:bold;
+}
+
+#final{
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>🎬 Публикация видео</h2>
+
+<div class="info">
+Введите 5 секретных хэштегов (каждый состоит из 3 слов).
+</div>
+
+<!-- ХЭШТЕГИ -->
+
+<div class="tagRow">
+<div class="className">6-А класс</div>
+<div class="hash">#</div>
+<input id="t1_1" placeholder="Слово 1">
+<input id="t1_2" placeholder="Слово 2">
+<input id="t1_3" placeholder="Слово 3">
+<button class="checkBtn" onclick="check(1,this)">✔</button>
+</div>
+
+<div class="tagRow">
+<div class="className">6-Б класс</div>
+<div class="hash">#</div>
+<input id="t2_1" placeholder="Слово 1">
+<input id="t2_2" placeholder="Слово 2">
+<input id="t2_3" placeholder="Слово 3">
+<button class="checkBtn" onclick="check(2,this)">✔</button>
+</div>
+
+<div class="tagRow">
+<div class="className">6-В класс</div>
+<div class="hash">#</div>
+<input id="t3_1" placeholder="Слово 1">
+<input id="t3_2" placeholder="Слово 2">
+<input id="t3_3" placeholder="Слово 3">
+<button class="checkBtn" onclick="check(3,this)">✔</button>
+</div>
+
+<div class="tagRow">
+<div class="className">6-Г класс</div>
+<div class="hash">#</div>
+<input id="t4_1" placeholder="Слово 1">
+<input id="t4_2" placeholder="Слово 2">
+<input id="t4_3" placeholder="Слово 3">
+<button class="checkBtn" onclick="check(4,this)">✔</button>
+</div>
+
+<div class="tagRow">
+<div class="className">6-Д класс</div>
+<div class="hash">#</div>
+<input id="t5_1" placeholder="Слово 1">
+<input id="t5_2" placeholder="Слово 2">
+<input id="t5_3" placeholder="Слово 3">
+<button class="checkBtn" onclick="check(5,this)">✔</button>
+</div>
+
+<!-- ЗАГРУЗКА -->
+
+<div id="barBox">
+<div id="bar"></div>
+</div>
+
+<div id="percent">0%</div>
+<div id="status"></div>
+<div id="final"></div>
+
+<button id="uploadBtn" class="main" onclick="upload()" disabled>
+Загрузить видео
+</button>
+
+</div>
+
+<script>
+
+let progress = 0;
+let done = [false,false,false,false,false];
+
+let answers = {
+1:["математика","вокруг","нас"],
+2:["знания","открывают","мир"],
+3:["без","математики","никуда"],
+4:["путешествуй","с","умом"],
+5:["математика","правит","миром"]
+};
+
+function norm(v){
+    return v.trim().toLowerCase().replace(/\s+/g," ");
+}
+
+function check(n,btn){
+
+let a1 = norm(document.getElementById("t"+n+"_1").value);
+let a2 = norm(document.getElementById("t"+n+"_2").value);
+let a3 = norm(document.getElementById("t"+n+"_3").value);
+
+let ok =
+a1===answers[n][0] &&
+a2===answers[n][1] &&
+a3===answers[n][2];
+
+if(ok){
+    btn.classList.remove("bad");
+    btn.classList.add("ok");
+    btn.innerText = "✔";
+
+    if(!done[n-1]){
+        progress += 20;
+        done[n-1]=true;
+    }
+}
+else{
+    btn.classList.remove("ok");
+    btn.classList.add("bad");
+    btn.innerText = "✖";
+}
+
+updateUI();
+checkReady();
+}
+
+function updateUI(){
+    document.getElementById("bar").style.width = progress + "%";
+    document.getElementById("percent").innerText = progress + "%";
+}
+
+function checkReady(){
+    let btn = document.getElementById("uploadBtn");
+
+    if(progress === 100){
+        btn.disabled = false;
+        btn.classList.add("active");
+    } else {
+        btn.disabled = true;
+        btn.classList.remove("active");
+    }
+}
+
+function upload(){
+
+if(progress < 100) return;
+
+document.getElementById("percent").style.display = "none";
+
+document.getElementById("status").innerText = "Загрузка...";
+document.getElementById("final").innerText = "";
+
+let bar = document.getElementById("bar");
+bar.style.transition = "none";
+bar.style.width = "0%";
+
+setTimeout(()=>{
+    bar.style.transition = "2.5s linear";
+    bar.style.width = "100%";
+},100);
+
+setTimeout(()=>{
+    document.getElementById("status").innerHTML =
+    "✔ Загрузка завершена: 100%";
+
+    document.getElementById("final").innerHTML =
+    "<span style='color:#16a34a;font-size:28px;font-weight:bold;'>🎬 Видео опубликовано</span>";
+},2700);
+
+}
+
+</script>
+
+</body>
+</html>
